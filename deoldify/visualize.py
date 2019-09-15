@@ -152,6 +152,7 @@ class VideoColorizer():
             .output(str(colorized_path), crf=17, vcodec='libx264') \
             .run(capture_stdout=True)
         colorframes_path_template.unlink()
+        print('删除彩色序列帧')
         result_path = self.result_folder/source_path.name
         if result_path.exists(): result_path.unlink()
         #making copy of non-audio version in case adding back audio doesn't apply or fails.
@@ -162,7 +163,7 @@ class VideoColorizer():
         if audio_file.exists(): audio_file.unlink()
 
         os.system('ffmpeg -y -i "' + str(source_path) + '" -vn -acodec copy "' + str(audio_file) + '"')
-
+        print('处理声音')
         if audio_file.exists:
             os.system('ffmpeg -y -i "' + str(colorized_path) + '" -i "' + str(audio_file) 
                 + '" -shortest -c:v copy -c:a aac -b:a 256k "' + str(result_path) + '"')
