@@ -152,7 +152,7 @@ class VideoColorizer():
             .output(str(colorized_path), crf=17, vcodec='libx264') \
             .run(capture_stdout=True)
         print('删除彩色序列帧')
-        shutil.rmtree(str(colorframes_path_template))
+        shutil.rmtree(str('video/colorframes/video'))
         result_path = self.result_folder/source_path.name
         if result_path.exists(): result_path.unlink()
         #making copy of non-audio version in case adding back audio doesn't apply or fails.
