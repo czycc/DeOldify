@@ -151,7 +151,7 @@ class VideoColorizer():
         ffmpeg.input(str(colorframes_path_template), format='image2', vcodec='mjpeg', framerate=fps) \
             .output(str(colorized_path), crf=17, vcodec='libx264') \
             .run(capture_stdout=True)
-
+        colorframes_path_template.unlink()
         result_path = self.result_folder/source_path.name
         if result_path.exists(): result_path.unlink()
         #making copy of non-audio version in case adding back audio doesn't apply or fails.
