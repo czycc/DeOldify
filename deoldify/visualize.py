@@ -138,15 +138,16 @@ class VideoColorizer():
             if os.path.isfile(str(img_path)):
                 color_image = self.vis.get_transformed_image(str(img_path), render_factor=render_factor)
                 color_image.save(str(colorframes_folder/img))
+                os.remove(str(img_path))
     
     def _build_video(self, source_path:Path)->Path:
+        print('开始制作视频')
         colorized_path = self.result_folder/(source_path.name.replace('.mp4', '_no_audio.mp4'))
         colorframes_folder = self.colorframes_root/(source_path.stem)
         colorframes_path_template = str(colorframes_folder/'%5d.jpg')
         colorized_path.parent.mkdir(parents=True, exist_ok=True)
         if colorized_path.exists(): colorized_path.unlink()
         fps = self._get_fps(source_path)
-
         ffmpeg.input(str(colorframes_path_template), format='image2', vcodec='mjpeg', framerate=fps) \
             .output(str(colorized_path), crf=17, vcodec='libx264') \
             .run(capture_stdout=True)
@@ -154,7 +155,7 @@ class VideoColorizer():
         result_path = self.result_folder/source_path.name
         if result_path.exists(): result_path.unlink()
         #making copy of non-audio version in case adding back audio doesn't apply or fails.
-        shutil.copyfile(str(colorized_path), str(result_path))
+        # shutil.copyfile(str(colorized_path), str(result_path))
 
         # adding back sound here
         audio_file = Path(str(source_path).replace('.mp4', '.aac'))
@@ -165,7 +166,7 @@ class VideoColorizer():
         if audio_file.exists:
             os.system('ffmpeg -y -i "' + str(colorized_path) + '" -i "' + str(audio_file) 
                 + '" -shortest -c:v copy -c:a aac -b:a 256k "' + str(result_path) + '"')
-        print('Video created here: ' + str(result_path))
+        print('创建完成: ' + str(result_path))
         return result_path
 
     def colorize_from_url(self, source_url, file_name:str, render_factor:int=None)->Path: 
